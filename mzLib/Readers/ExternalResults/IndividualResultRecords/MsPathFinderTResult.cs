@@ -3,10 +3,11 @@ using CsvHelper.Configuration;
 using Chemistry;
 using Omics.Modifications;
 using Omics;
+using Readers.BaseClasses;
 
 namespace Readers
 {
-    public class MsPathFinderTResult : ISpectralMatch
+    public class MsPathFinderTResult : ISpectralMatch, Iresult
     {
         public static CsvConfiguration CsvConfiguration { get; } = new CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)
         {
@@ -90,6 +91,11 @@ namespace Readers
 
         [Ignore] private bool? _isDecoy = null;
         [Ignore] public bool IsDecoy => _isDecoy ??= ProteinName.StartsWith("XXX");
+
+        [Ignore] public double Mass
+        {
+            get { return MonoisotopicMass; }
+        }
         [Optional] public string FileNameWithoutExtension { get; set; }
 
         [Ignore] private Dictionary<int, Modification>? _allModsOneIsNterminus;

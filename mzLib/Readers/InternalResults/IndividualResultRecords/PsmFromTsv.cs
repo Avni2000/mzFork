@@ -2,12 +2,13 @@
 using Easy.Common.Extensions;
 using Omics.Fragmentation;
 using Omics.SpectrumMatch;
+using Readers.BaseClasses;
 
 namespace Readers
 {
-    public class PsmFromTsv : SpectrumMatchFromTsv
+    public class PsmFromTsv : SpectrumMatchFromTsv, Iresult
     {
-
+        public int OneBasedScanNumber => 
         public string ProteinAccession => Accession;
         public string ProteinName => Name;
         public string PeptideMonoMass => MonoisotopicMass;
