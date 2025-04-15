@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Readers.BaseClasses
 {
-    public interface Iresult
+    public interface IResult
     {    /// <summary>
         /// The scan number of the identification
         /// </summary>

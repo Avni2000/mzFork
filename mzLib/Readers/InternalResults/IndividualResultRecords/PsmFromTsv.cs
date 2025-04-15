@@ -6,7 +6,7 @@ using Readers.BaseClasses;
 
 namespace Readers
 {
-    public class PsmFromTsv : SpectrumMatchFromTsv, Iresult
+    public class PsmFromTsv : SpectrumMatchFromTsv, IResult
     {
         public int OneBasedScanNumber => 
         public string ProteinAccession => Accession;

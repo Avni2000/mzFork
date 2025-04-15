@@ -71,9 +71,9 @@ namespace Readers.ConsensusDataset
             var dict = ToCertainList(result);
 
         }
-        public List<Iresult> ToCertainList(MsPathFinderTResultFile resultFile)
+        public List<IResult> ToCertainList(MsPathFinderTResultFile resultFile)
         {
-            List<Iresult> results = new List<Iresult>();
+            List<IResult> results = new List<IResult>();
             using var csv = new CsvReader(new StreamReader(outPath), MsPathFinderTResult.CsvConfiguration);
             var Results = csv.GetRecords<MsPathFinderTResult>().ToList();
             foreach (MsPathFinderTResult res in Results)

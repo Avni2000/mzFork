@@ -7,7 +7,7 @@ using Readers.BaseClasses;
 
 namespace Readers
 {
-    public class MsPathFinderTResult : ISpectralMatch, Iresult
+    public class MsPathFinderTResult : ISpectralMatch, IResult
     {
         public static CsvConfiguration CsvConfiguration { get; } = new CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)
         {
