@@ -1,6 +1,10 @@
 ﻿using System.Globalization;
+using System.Transactions;
+using CsvHelper.Configuration.Attributes;
 using Easy.Common.Extensions;
+using Omics;
 using Omics.Fragmentation;
+using Omics.Modifications;
 using Omics.SpectrumMatch;
 using Readers.BaseClasses;
 
@@ -8,7 +12,37 @@ namespace Readers
 {
     public class PsmFromTsv : SpectrumMatchFromTsv, IResult
     {
-        public int OneBasedScanNumber => 
+        public int OneBasedScanNumber => Ms2ScanNumber;
+        public string BaseSequence => BaseSeq;
+        public bool IsDecoy => DecoyContamTarget == "D";
+
+        public int Charge => PrecursorCharge;
+        public double Mass => PrecursorMass;
+        public string Modifications
+        {
+            get
+            {
+                var modifications = _Modifications;
+                if (modifications == null || modifications.Count == 0)
+                    return string.Empty;
+
+                var modStrings = new List<string>();
+                foreach (var pos in modifications)
+                {
+                    int position = pos.Key + 1; // one based?
+                    foreach (var mod in pos.Value)
+                    {
+                        modStrings.Add($"{position}({mod})");
+                    }
+                }
+                return string.Join(", ", modStrings);
+            }
+        }
+        private Dictionary<int, List<String>> _Modifications
+        {
+            get { return ParseModifications(FullSequence); }
+        }
+
         public string ProteinAccession => Accession;
         public string ProteinName => Name;
         public string PeptideMonoMass => MonoisotopicMass;
