@@ -2,6 +2,8 @@
 using Easy.Common.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data.Entity.Infrastructure.Interception;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -37,9 +39,7 @@ namespace Readers.ConsensusDataset
             spectraPath = @"" + spectraPath;
             dataPath = @"" + dataPath;
             outPath = @"" + outPath;
-            string exeParams = " -s " + "\"" + spectraPath + "\"" + " -d " + "\"" + dataPath + "\"" + " -o " + "\"" +
-                               outPath + "\"" +
-                               " -ic 2 -f 20 -MinLength 7 -MaxLength 1000000 -MinCharge 1 -MaxCharge 60 -MinFragCharge 1 -MaxFragCharge 10 -MinMass 0 -MaxMass 30000 -tda 1"; //100000
+            string exeParams = "-d " + dataPath + " -o " + outPath + " -s " + spectraPath + " -t " + @"./settings.toml";
             var process = new Process
             {
                 StartInfo =
@@ -65,16 +65,20 @@ namespace Readers.ConsensusDataset
         //out path is the same as the directory of the spectraPath
         {
             outPath = Path.GetDirectoryName(spectraPath) ?? throw new ArgumentNullException("why is spectra path null..."); 
-            MsPathFinderTResultFile result = new MsPathFinderTResultFile(Path.ChangeExtension(Path.GetDirectoryName(spectraPath), @"\Task1SearchTask\AllPSMs.psmtsv"));  //all psms or all prot?
-            var dict = FileToList(result);
+            PsmFromTsvFile result = new PsmFromTsvFile(Path.ChangeExtension(Path.GetDirectoryName(spectraPath), @"\Task1SearchTask\AllPSMs.psmtsv"));  //all psms or all prot?
+
+
+            //   SQL(list);
 
             /*
              * Given: \Desktop as output, the output file is named "C:\Users\avnib\Desktop\Task1SearchTask\AllPSMs.psmtsv"
-             * As such, +\Task1SearchTask\AllPSMs.psmtsv -> TODO I need to find a way to delete the Task1SearchTask folder at some point, it has the potential to "hide" lots of data. 
+             * As such, +\Task1SearchTask\AllPSMs.psmtsv -> TODO I need to find a way to delete the Task1SearchTask folder at some point, it has the potential to "hide" lots of data.
+             *
              */
         }
 
-        public List<IResult> FileToList(MsPathFinderTResultFile resultFile) => new List<IResult> { resultFile };
+        public List<IResult> FileToList(PsmFromTsv resultFile) => new List<IResult> { resultFile };
 
+       // public void SQL(List<>)
     }
 }
