@@ -1,12 +1,12 @@
 ﻿using CsvHelper;
 using Easy.Common.Extensions;
-using Readers.ExternalResults.BaseClasses;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Readers.BaseClasses;
 
 namespace Readers.ConsensusDataset
 {
@@ -51,29 +51,18 @@ namespace Readers.ConsensusDataset
         }
 
         public HolyDatasetMM(string exePath, string spectraPath, string dataPath) : this(exePath, spectraPath,
-            dataPath,
-            Path.GetDirectoryName(spectraPath) ?? throw new ArgumentNullException(nameof(spectraPath))) //out path is the same as the directory of the spectraPath
+            dataPath, Path.GetDirectoryName(spectraPath) ?? throw new ArgumentNullException(nameof(spectraPath))) 
+        //out path is the same as the directory of the spectraPath
         {
-            outPath = Path.GetDirectoryName(spectraPath) ?? throw new ArgumentNullException(nameof(spectraPath)); // @"\Task1SearchTask\AllProteoforms.psmtsv")
+            outPath = Path.GetDirectoryName(spectraPath) ?? throw new ArgumentNullException("why is spectra path null..."); // @"\Task1SearchTask\AllProteoforms.psmtsv")
             //result handling
             MsPathFinderTResultFile result =
                 new MsPathFinderTResultFile(Path.ChangeExtension(spectraPath,
                     "_IcTda.tsv")); //suppose spectraPath.raw -> spectraPath_IcTda.tsv. TODO double check. Just a guess.
-            var dict = ToCertainList(result);
+            var dict = FileToList(result);
         }
 
-        public List<IResult> ToCertainList(MsPathFinderTResultFile resultFile)
-        {
-            List<IResult> results = new List<IResult>();
-            using var csv = new CsvReader(new StreamReader(outPath), MsPathFinderTResult.CsvConfiguration);
-            var Results = csv.GetRecords<MsPathFinderTResult>().ToList();
-            foreach (MsPathFinderTResult res in Results)
-            {
-                results.Add(res);
-            }
-
-            return results;
-        }
+        public List<IResult> FileToList(MsPathFinderTResultFile resultFile) => new List<IResult> { resultFile };
 
     }
 }

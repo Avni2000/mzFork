@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using CsvHelper.Configuration;
 using CsvHelper.Configuration.Attributes;
 using MassSpectrometry;
+using Readers.BaseClasses;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Readers;
@@ -18,7 +19,7 @@ namespace Readers;
 /// Convert Variable Modifications to a list of Modification objects
 /// Convert NTerminalForm to a Modification object
 /// </remarks>
-public class ToppicPrsm
+public class ToppicPrsm : IResult
 {
     [Ignore]
     public static CsvConfiguration CsvConfiguration => new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -61,6 +62,9 @@ public class ToppicPrsm
     [Name("Charge")]
     public int PrecursorCharge { get; set; }
 
+    [Ignore] public int Charge => PrecursorCharge;
+
+    [Ignore] public bool IsDecoy => true;
     [Name("Precursor mass")]
     public double PrecursorMass { get; set; }
 
@@ -85,6 +89,8 @@ public class ToppicPrsm
 
     [Name("Protein accession")]
     public string ProteinAccession { get; set; }
+
+    [Ignore] public string Accession => ProteinAccession;
 
     [Name("Protein description")]
     public string ProteinDescription { get; set; }
@@ -114,6 +120,7 @@ public class ToppicPrsm
 
     [Name("Proteoform mass")]
     public double FullSequenceMass { get; set; }
+    [Ignore] public double Mass => FullSequenceMass;
 
     [Name("Protein N-terminal form")]
     public string ProteinNTerminalForm { get; set; }
@@ -132,7 +139,10 @@ public class ToppicPrsm
     [Optional]
     [Name("unexpected modifications")]
     public string UnexpectedModifications { get; set; }
-    
+    [Ignore]
+    public string Modifications => FixedPTMs + (string.IsNullOrEmpty(VariableModifications) ? "" : "," + VariableModifications) +
+                                     (string.IsNullOrEmpty(UnexpectedModifications) ? "" : "," + UnexpectedModifications);
+
     [Name("#variable PTMs")]
     public int VariableModificationsCount { get; set; }
 

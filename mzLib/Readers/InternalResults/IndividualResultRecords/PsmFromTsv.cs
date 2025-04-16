@@ -10,7 +10,7 @@ using Readers.BaseClasses;
 
 namespace Readers
 {
-    public class PsmFromTsv : SpectrumMatchFromTsv, IResult
+    public class PsmFromTsv : SpectrumMatchFromTsv, IResult //ISpectralMatch missing Nterminusmods, might be an easy fix.
     {
         public int OneBasedScanNumber => Ms2ScanNumber;
         public string BaseSequence => BaseSeq;
