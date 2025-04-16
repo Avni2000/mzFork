@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Readers.BaseClasses;
 using System.Diagnostics;
-using System.Linq;
-using System.Media;
-using System.Text;
-using System.Threading.Tasks;
-using Readers;
-using System.IO;
-using TopDownProteomics.IO.Resid;
-using MathNet.Numerics.RootFinding;
-using ThermoFisher.CommonCore.Data;
-using CsvHelper;
-using Readers.BaseClasses;
+using System.Data.SQLite;
 
 namespace Readers.ConsensusDataset
 {
@@ -49,9 +38,7 @@ namespace Readers.ConsensusDataset
                     WorkingDirectory = Path.GetDirectoryName(exePath),
                     Arguments = exeParams,
                 }
-
             };
-
             process.Start();
             process.WaitForExit();
         }
@@ -68,19 +55,20 @@ namespace Readers.ConsensusDataset
             MsPathFinderTResultFile result =
                 new MsPathFinderTResultFile(Path.ChangeExtension(spectraPath,
                     "_IcTda.tsv")); //suppose spectraPath.raw -> spectraPath_IcTda.tsv. TODO double check. Just a guess.
-            var dict = ToCertainList(result);
+            var dict = FileToList(result);
+            SQL(dict);
 
         }
-        public List<IResult> ToCertainList(MsPathFinderTResultFile resultFile)
+        public List<IResult> FileToList(MsPathFinderTResultFile resultFile) => new List<IResult>(resultFile);
+
+        public void SQL(List<IResult> IresultList)
         {
-            List<IResult> results = new List<IResult>();
-            using var csv = new CsvReader(new StreamReader(outPath), MsPathFinderTResult.CsvConfiguration);
-            var Results = csv.GetRecords<MsPathFinderTResult>().ToList();
-            foreach (MsPathFinderTResult res in Results)
-            { 
-                results.Add(res);
-            }
-            return results;
+            var connection = new SQLiteConnection("Data Source=myDatabase.db;Version=3;");
+            connection.Open();
+
+            // Create table and insert data
+            var command = new SQLiteCommand("CREATE TABLE IF NOT EXISTS People (Name TEXT, Age INT);", connection);
+            command.ExecuteNonQuery();
         }
     }
 }

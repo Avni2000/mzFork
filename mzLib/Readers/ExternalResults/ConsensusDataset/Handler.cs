@@ -11,10 +11,10 @@ namespace Readers.ConsensusDataset
     {
         public Handler(string spectraPath, string dataPath, string outPath)
         {
-            HolyDatasetMST MST = new HolyDatasetMST(FindExePath("MSPathFinderT.exe"), spectraPath, dataPath); //ALWAYS LEAVE OUT PATH EMPTY.
-            HolyDatasetTopPIC Toppic = new HolyDatasetTopPIC(FindExePath("TopPIC.exe"), spectraPath, dataPath); //TODO 
+// HolyDatasetMST MST = new HolyDatasetMST(FindExePath("MSPathFinderT.exe"), spectraPath, dataPath); //ALWAYS LEAVE OUT PATH EMPTY.
+         //   HolyDatasetTopPIC Toppic = new HolyDatasetTopPIC(FindExePath("TopPIC.exe"), spectraPath, dataPath); //TODO 
              
-            //   HolyDatasetMM MM = new HolyDatasetMM(FindExePath("CMD.exe"), spectraPath, dataPath);
+            HolyDatasetMM MM = new HolyDatasetMM(FindExePath("CMD.exe"), spectraPath, dataPath);
         }
         public string FindExePath(string toolName)
         {

@@ -17,9 +17,13 @@ namespace Readers.ConsensusDataset
         private string spectraPath;
         private string dataPath;
 
-        /*
-         * Returns output given by outPath, user Defined
-         */
+        /// <summary>
+        /// Usually unused constructor that can return output to a user defined path if need be
+        /// </summary>
+        /// <param name="exePath"></param>
+        /// <param name="spectraPath"></param>
+        /// <param name="dataPath"></param>
+        /// <param name="outPath"></param>
         public HolyDatasetMM(string exePath, string spectraPath, string dataPath,
             string outPath) //TODO TEST
         {
@@ -49,17 +53,25 @@ namespace Readers.ConsensusDataset
             process.Start();
             process.WaitForExit();
         }
-
+        /// <summary>
+        /// Constructor that fulfillls the MM requirements of the Consensus dataset project.
+        /// </summary>
+        /// <param name="exePath"></param>
+        /// <param name="spectraPath"></param>
+        /// <param name="dataPath"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public HolyDatasetMM(string exePath, string spectraPath, string dataPath) : this(exePath, spectraPath,
-            dataPath, Path.GetDirectoryName(spectraPath) ?? throw new ArgumentNullException(nameof(spectraPath))) 
+            dataPath, Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(spectraPath))) ?? throw new ArgumentNullException(nameof(spectraPath))) 
         //out path is the same as the directory of the spectraPath
         {
-            outPath = Path.GetDirectoryName(spectraPath) ?? throw new ArgumentNullException("why is spectra path null..."); // @"\Task1SearchTask\AllProteoforms.psmtsv")
-            //result handling
-            MsPathFinderTResultFile result =
-                new MsPathFinderTResultFile(Path.ChangeExtension(spectraPath,
-                    "_IcTda.tsv")); //suppose spectraPath.raw -> spectraPath_IcTda.tsv. TODO double check. Just a guess.
+            outPath = Path.GetDirectoryName(spectraPath) ?? throw new ArgumentNullException("why is spectra path null..."); 
+            MsPathFinderTResultFile result = new MsPathFinderTResultFile(Path.ChangeExtension(Path.GetDirectoryName(spectraPath), @"\Task1SearchTask\AllPSMs.psmtsv"));  //all psms or all prot?
             var dict = FileToList(result);
+
+            /*
+             * Given: \Desktop as output, the output file is named "C:\Users\avnib\Desktop\Task1SearchTask\AllPSMs.psmtsv"
+             * As such, +\Task1SearchTask\AllPSMs.psmtsv -> TODO I need to find a way to delete the Task1SearchTask folder at some point, it has the potential to "hide" lots of data. 
+             */
         }
 
         public List<IResult> FileToList(MsPathFinderTResultFile resultFile) => new List<IResult> { resultFile };
