@@ -6,6 +6,7 @@ using System.Configuration;
 using System.Data.Entity.Infrastructure.Interception;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Readers.BaseClasses;
@@ -14,10 +15,9 @@ namespace Readers.ConsensusDataset
 {
     public class HolyDatasetMM
     {
+        private bool init = false;
+        private bool ended = false;
         private string outPath;
-        private string exePath;
-        private string spectraPath;
-        private string dataPath;
 
         /// <summary>
         /// Usually unused constructor that can return output to a user defined path if need be
@@ -27,32 +27,48 @@ namespace Readers.ConsensusDataset
         /// <param name="dataPath"></param>
         /// <param name="outPath"></param>
         public HolyDatasetMM(string exePath, string spectraPath, string dataPath,
-            string outPath) //TODO TEST
+            string outPath) 
         {
             //initialize to class variables
-            this.exePath = exePath;
-            this.spectraPath = spectraPath;
-            this.dataPath = dataPath;
-            this.outPath = outPath;
 
-            exePath = @"" + exePath;
-            spectraPath = @"" + spectraPath;
-            dataPath = @"" + dataPath;
-            outPath = @"" + outPath;
-            string exeParams = "-d " + dataPath + " -o " + outPath + " -s " + spectraPath + " -t " + @"./settings.toml";
+
+            this.outPath = outPath;
+            string workingDirectory = Environment.CurrentDirectory;
+            string projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent.Parent.Parent.FullName;
+            string settingsPath = Path.Combine(projectDirectory, "Readers", "ExternalResults", "ConsensusDataset", "settings.toml");
+          //  exePath = @""+ exePath;
+          //  spectraPath = @"" + spectraPath;
+     //       dataPath = @"" + dataPath;
+      //      outPath = @"" + outPath;
+            Console.WriteLine(settingsPath);
+
+            if (!File.Exists(settingsPath))
+            {
+                throw new FileNotFoundException($"settings.toml not found at: {settingsPath}");
+            }
+            string exeParams = $"-d " + dataPath + " -o " +  outPath + " -s " + spectraPath + " -t " + settingsPath;
             var process = new Process
             {
                 StartInfo =
                 {
                     FileName = exePath,
-                    WorkingDirectory = Path.GetDirectoryName(exePath),
                     Arguments = exeParams,
+                    WorkingDirectory = Path.GetDirectoryName(exePath),
+                    UseShellExecute = true,        
+                    CreateNoWindow = false, 
+                    WindowStyle = ProcessWindowStyle.Normal 
                 }
             };
 
             process.Start();
-            process.WaitForExit();
+            process.WaitForExit(300000);
+            if(process.HasExited) ended = true;
+            if (process.ExitCode != 0)
+            {
+                throw new Exception($"MetaMorpheus failed with exit code: {process.ExitCode}");
+            }
         }
+
         /// <summary>
         /// Constructor that fulfillls the MM requirements of the Consensus dataset project.
         /// </summary>
@@ -61,23 +77,62 @@ namespace Readers.ConsensusDataset
         /// <param name="dataPath"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public HolyDatasetMM(string exePath, string spectraPath, string dataPath) : this(exePath, spectraPath,
-            dataPath, Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(spectraPath))) ?? throw new ArgumentNullException(nameof(spectraPath))) 
+            dataPath,
+            Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(spectraPath))) ??
+            throw new ArgumentNullException(nameof(spectraPath)))
         //out path is the same as the directory of the spectraPath
+        // {
+        //     if !(File.Exists(@"C:\Users\avnib\Desktop\Task1SearchTask\AllPSMs.psmtsv"))
+        //     {
+        //         WaitForChangedResult(File.Exists(@"C:\Users\avnib\Desktop\Task1SearchTask\AllPSMs.psmtsv"));
+        //     }
+        //     
+        //
+        //
+        //     var outX = Path.GetDirectoryName(Path.GetDirectoryName(spectraPath) ??
+        //                                      throw new ArgumentNullException("why is spectra path null..."));
+        //         var result = new PsmFromTsvFile(Path.ChangeExtension(Path.GetDirectoryName(outX),
+        //                                             @"\Task1SearchTask\AllPSMs.psmtsv") ??
+        //                                         throw new ArgumentNullException(
+        //                                             "Not detected")); //all psms or all prot?
+        //
+        //     FileToList(result);
+        //     
+        // }
         {
-            outPath = Path.GetDirectoryName(spectraPath) ?? throw new ArgumentNullException("why is spectra path null..."); 
-            PsmFromTsvFile result = new PsmFromTsvFile(Path.ChangeExtension(Path.GetDirectoryName(spectraPath), @"\Task1SearchTask\AllPSMs.psmtsv"));  //all psms or all prot?
 
+            string expectedFile = Path.Combine(outPath, "Task1SearchTask", "ALLPSMs.psmtsv");
 
-            //   SQL(list);
+            WaitForFile(expectedFile, 3000000); //maybe check how much that is lol
 
-            /*
-             * Given: \Desktop as output, the output file is named "C:\Users\avnib\Desktop\Task1SearchTask\AllPSMs.psmtsv"
-             * As such, +\Task1SearchTask\AllPSMs.psmtsv -> TODO I need to find a way to delete the Task1SearchTask folder at some point, it has the potential to "hide" lots of data.
-             *
-             */
+            var result = new PsmFromTsvFile(expectedFile);
+            var iList = FileToList(result);
+            for (int i = 0; i < iList.Count; i++)
+            {
+                Console.WriteLine(iList[i].BaseSequence);
+            }
         }
 
-        public List<IResult> FileToList(PsmFromTsv resultFile) => new List<IResult> { resultFile };
+        /*
+         * Given: \Desktop as output, the output file is named "C:\Users\avnib\Desktop\Task1SearchTask\AllPSMs.psmtsv"
+         * As such, +\Task1SearchTask\AllPSMs.psmtsv -> TODO I need to find a way to delete the Task1SearchTask folder at some point, it has the potential to "hide" lots of data.
+         *
+         */
+
+
+        private static void WaitForFile(string fullPath, int timeoutMilliseconds)
+        {
+            var sw = Stopwatch.StartNew();
+            while (!File.Exists(fullPath))
+            {
+                if (sw.ElapsedMilliseconds > timeoutMilliseconds)
+                    throw new TimeoutException($"Timed out waiting for file to appear: {fullPath}");
+                Thread.Sleep(500);
+            }
+        }
+
+        public static List<IResult> FileToList(PsmFromTsvFile resultFile) => new List<IResult> { resultFile };
+
 
        // public void SQL(List<>)
     }

@@ -14,7 +14,11 @@
 	  <None Remove="Resources\ptmlist.txt" />
 	  <None Remove="Resources\unimod.xml" />
 	</ItemGroup>
-
+	<ItemGroup>
+		<None Include="ExternalResults\ConsensusDataset\settings.toml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="CsvHelper" Version="32.0.3" />
 		<PackageReference Include="OpenMcdf" Version="2.3.1" />

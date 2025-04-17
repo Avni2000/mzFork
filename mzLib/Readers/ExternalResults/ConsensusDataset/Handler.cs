@@ -11,10 +11,10 @@ namespace Readers.ConsensusDataset
     {
         public Handler(string spectraPath, string dataPath)
         {
-        // HolyDatasetMST MST = new HolyDatasetMST(FindExePath("MSPathFinderT.exe"), spectraPath, dataPath); //ALWAYS LEAVE OUT PATH EMPTY.
+        HolyDatasetMST MST = new HolyDatasetMST(FindExePath("MSPathFinderT.exe"), spectraPath, dataPath); 
          //   HolyDatasetTopPIC Toppic = new HolyDatasetTopPIC(FindExePath("TopPIC.exe"), spectraPath, dataPath); //TODO 
              
-            HolyDatasetMM MM = new HolyDatasetMM(FindExePath("CMD.exe"), spectraPath, dataPath);
+          //  HolyDatasetMM MM = new HolyDatasetMM(FindExePath("CMD.exe"), spectraPath, dataPath);
         }
         //Handler x = new Handler (spectra path, data path)
         public static string FindExePath(string toolName)
@@ -23,7 +23,7 @@ namespace Readers.ConsensusDataset
             {
                 case "MSPathFinderT.exe":
                     string[] predefinedPath =
-                        { @"C:\Program Files\Informed-Proteomics", @"C:\Program Files (x86)\Informed-Proteomics", };
+                        { @"C:\Program Files\Informed-Proteomics", @"C:\Program Files (x86)\Informed-Proteomics", }; //change to non hardcoded
                     string[] searchDir =
                     {
                         @"C:\Program Files (x86)", @"C:\Program Files",

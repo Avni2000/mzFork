@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Transactions;
+using CsvHelper.Configuration;
 using CsvHelper.Configuration.Attributes;
 using Easy.Common.Extensions;
 using Omics;
