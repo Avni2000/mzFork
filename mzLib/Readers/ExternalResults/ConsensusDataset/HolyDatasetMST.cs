@@ -27,18 +27,22 @@ namespace Readers.ConsensusDataset
             spectraPath = @"" + spectraPath;
             dataPath = @"" + dataPath;
             outPath = @"" + outPath;
-            string exeParams = " -s " + "\"" + spectraPath + "\"" + " -d " + "\"" + dataPath + "\"" + " -o " + "\"" +
-                               outPath + "\"" +
-                               " -ic 2 -f 20 -MinLength 7 -MaxLength 1000000 -MinCharge 1 -MaxCharge 60 -MinFragCharge 1 -MaxFragCharge 10 -MinMass 0 -MaxMass 30000 -tda 1"; //100000
+            string exeParams = "-s " + spectraPath + " -d " + dataPath + " -o " +
+                               outPath +" -ic 2 -f 20 -MinLength 7 -MaxLength 1000000 -MinCharge 1 -MaxCharge 60 -MinFragCharge 1 -MaxFragCharge 10 -MinMass 0 -MaxMass 30000 -tda 1";
             var process = new Process
             {
                 StartInfo =
                 {
                     FileName = exePath,
-                    WorkingDirectory = Path.GetDirectoryName(exePath),
                     Arguments = exeParams,
+                    WorkingDirectory = Path.GetDirectoryName(exePath),
+                    UseShellExecute = true,
+                    CreateNoWindow = false,
+                    WindowStyle = ProcessWindowStyle.Normal
                 }
+
             };
+
             process.Start();
             process.WaitForExit();
         }
@@ -51,24 +55,19 @@ namespace Readers.ConsensusDataset
             Path.GetDirectoryName(@"" + spectraPath)) //out path is the same as the directory of the spectraPath
         {
             outPath = Path.ChangeExtension(spectraPath, "_IcTda.tsv");
+            string outMessage = outPath.ToString();
             //result handling
+            if (!File.Exists(outPath))
+            {
+                throw new FileNotFoundException("Actual outPath:" + outMessage);
+            }
+
             MsPathFinderTResultFile result =
                 new MsPathFinderTResultFile(Path.ChangeExtension(spectraPath,
                     "_IcTda.tsv")); //suppose spectraPath.raw -> spectraPath_IcTda.tsv. TODO double check. Just a guess.
             var dict = FileToList(result);
-            SQL(dict);
 
         }
-        public List<IResult> FileToList(MsPathFinderTResultFile resultFile) => new List<IResult>(resultFile);
-
-        public void SQL(List<IResult> IresultList)
-        {
-            var connection = new SQLiteConnection("Data Source=myDatabase.db;Version=3;");
-            connection.Open();
-
-            // Create table and insert data
-            var command = new SQLiteCommand("CREATE TABLE IF NOT EXISTS People (Name TEXT, Age INT);", connection);
-            command.ExecuteNonQuery();
-        }
+        public static List<IResult> FileToList(MsPathFinderTResultFile resultFile) => new List<IResult>(resultFile);
     }
 }

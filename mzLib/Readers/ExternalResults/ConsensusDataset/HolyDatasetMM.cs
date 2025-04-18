@@ -80,25 +80,6 @@ namespace Readers.ConsensusDataset
             dataPath,
             Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(spectraPath))) ??
             throw new ArgumentNullException(nameof(spectraPath)))
-        //out path is the same as the directory of the spectraPath
-        // {
-        //     if !(File.Exists(@"C:\Users\avnib\Desktop\Task1SearchTask\AllPSMs.psmtsv"))
-        //     {
-        //         WaitForChangedResult(File.Exists(@"C:\Users\avnib\Desktop\Task1SearchTask\AllPSMs.psmtsv"));
-        //     }
-        //     
-        //
-        //
-        //     var outX = Path.GetDirectoryName(Path.GetDirectoryName(spectraPath) ??
-        //                                      throw new ArgumentNullException("why is spectra path null..."));
-        //         var result = new PsmFromTsvFile(Path.ChangeExtension(Path.GetDirectoryName(outX),
-        //                                             @"\Task1SearchTask\AllPSMs.psmtsv") ??
-        //                                         throw new ArgumentNullException(
-        //                                             "Not detected")); //all psms or all prot?
-        //
-        //     FileToList(result);
-        //     
-        // }
         {
 
             string expectedFile = Path.Combine(outPath, "Task1SearchTask", "ALLPSMs.psmtsv");
@@ -115,7 +96,7 @@ namespace Readers.ConsensusDataset
 
         /*
          * Given: \Desktop as output, the output file is named "C:\Users\avnib\Desktop\Task1SearchTask\AllPSMs.psmtsv"
-         * As such, +\Task1SearchTask\AllPSMs.psmtsv -> TODO I need to find a way to delete the Task1SearchTask folder at some point, it has the potential to "hide" lots of data.
+         * As such, +\Task1SearchTask\AllPSMs.psmtsv -> TODO Consider making duplicate taskFolders?
          *
          */
 
