@@ -54,7 +54,7 @@ namespace Readers.ConsensusDataset
             dataPath,
             Path.GetDirectoryName(@"" + spectraPath)) //out path is the same as the directory of the spectraPath
         {
-            outPath = Path.ChangeExtension(spectraPath, "_IcTda.tsv");
+            string fullName = outPath.Substring(0, outPath.Length - 4) + "IcTda.tsv";
             string outMessage = outPath.ToString();
             //result handling
             if (!File.Exists(outPath))
