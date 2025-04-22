@@ -50,9 +50,7 @@ namespace Readers.ConsensusDataset
         /*
          * OutPath left empty, use for result handling purposes
          */
-        public HolyDatasetMST(string exePath, string spectraPath, string dataPath) : this(exePath, spectraPath,
-            dataPath,
-            Path.GetDirectoryName(@"" + spectraPath)) //out path is the same as the directory of the spectraPath
+        public HolyDatasetMST(string exePath, string spectraPath, string dataPath) : this(exePath, spectraPath,dataPath, Path.GetDirectoryName(@"" + spectraPath)) //out path is the same as the directory of the spectraPath
         {
             string fullName = outPath.Substring(0, outPath.Length - 4) + "IcTda.tsv";
             string outMessage = outPath.ToString();
